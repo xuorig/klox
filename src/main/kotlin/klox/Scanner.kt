@@ -122,7 +122,7 @@ class Scanner(val source: String) {
             while (Character.isDigit(peek())) advance()
         }
 
-        addToken(TokenType.NUMBER, source.substring(start, current))
+        addToken(TokenType.NUMBER, source.substring(start, current).toDouble())
     }
 
     private fun peekNext(): Char {

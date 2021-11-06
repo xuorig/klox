@@ -35,6 +35,10 @@ class Klox {
         if (hadError) {
             exitProcess(65)
         }
+
+        if (hadRuntimeError) {
+            exitProcess(70)
+        }
     }
 
     private fun runKlox(source: String) {
@@ -46,11 +50,16 @@ class Klox {
 
         if (hadError) return
 
-        println(AstPrinter().print(expression!!))
+        if (expression != null) {
+            interpreter.interpret(expression)
+        }
     }
 
     companion object {
+        private var hadRuntimeError: Boolean = false
         private var hadError: Boolean = false
+
+        private val interpreter: Interpreter = Interpreter()
 
         fun error(line: Int, message: String) {
             report(line, "", message)
@@ -67,6 +76,11 @@ class Klox {
         private fun report(line: Int, where: String, message: String) {
             println("[Line $line] Error $where: $message")
             hadError = true
+        }
+
+        fun runtimeError(error: RuntimeError) {
+            println(error.message + "[line $error.token.line]")
+            hadRuntimeError = true
         }
     }
 }
