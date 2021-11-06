@@ -2,12 +2,12 @@ package klox
 
 import java.lang.RuntimeException
 
-class Interpreter : Visitor<Any?> {
-    fun interpret(expression: Expr) {
+class Interpreter : Visitor<Any?>, StmtVisitor {
+    fun interpret(statements: List<Stmt>) {
        try {
-           val returnedValue = evaluate(expression)
-           println(stringify(returnedValue))
-
+           for (statement in statements) {
+               statement.accept(this)
+           }
        } catch (error: RuntimeError) {
            Klox.runtimeError(error)
        }
@@ -126,4 +126,14 @@ class Interpreter : Visitor<Any?> {
         if (obj == null) return false
         if (obj is Boolean) return obj
         return true
-    }}
+    }
+
+    override fun visitExpressionStmt(stmt: Stmt.Expression) {
+        evaluate(stmt.expression)
+    }
+
+    override fun visitPrintStmt(stmt: Stmt.Print) {
+        val value = evaluate(stmt.expression)
+        println(stringify(value))
+    }
+}

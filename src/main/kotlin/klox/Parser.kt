@@ -1,18 +1,43 @@
 package klox
 
 import java.lang.RuntimeException
+import kotlin.math.exp
 
 class Parser(val tokens: MutableList<Token>) {
     class ParseError : RuntimeException() {}
 
     var current: Int = 0
 
-    fun parse(): Expr? {
-        try {
-            return expression()
-        } catch (error: ParseError) {
-            return null
+    fun parse(): List<Stmt> {
+        val statements = mutableListOf<Stmt>()
+
+        while (!isAtEnd()) {
+            statements.add(statement())
         }
+
+        return statements
+    }
+
+    private fun statement(): Stmt {
+        if (match(TokenType.PRINT)) return printStatement()
+
+        return expressionStatement()
+    }
+
+    private fun expressionStatement(): Stmt {
+        val expr = expression()
+
+        consume(TokenType.SEMICOLON, "Expect ';' after expression.")
+
+        return Stmt.Expression(expr)
+    }
+
+    private fun printStatement(): Stmt {
+        val value = expression()
+
+        consume(TokenType.SEMICOLON, "Expect ';' after value.")
+
+        return Stmt.Print(value)
     }
 
     private fun expression(): Expr {

@@ -46,13 +46,11 @@ class Klox {
         val tokens = scanner.scanTokens()
 
         val parser = Parser(tokens as MutableList<Token>)
-        val expression = parser.parse()
+        val statements = parser.parse()
 
         if (hadError) return
 
-        if (expression != null) {
-            interpreter.interpret(expression)
-        }
+        interpreter.interpret(statements)
     }
 
     companion object {
