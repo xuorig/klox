@@ -15,7 +15,7 @@ sealed class Expr {
         }
     }
 
-    class Literal(val literalValue: Any) : Expr() {
+    class Literal(val literalValue: Any?) : Expr() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitLiteralExpr(this)
         }
