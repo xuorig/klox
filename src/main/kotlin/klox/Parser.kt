@@ -1,7 +1,19 @@
 package klox
 
+import java.lang.RuntimeException
+
 class Parser(val tokens: MutableList<Token>) {
+    class ParseError : RuntimeException() {}
+
     var current: Int = 0
+
+    fun parse(): Expr? {
+        try {
+            return expression()
+        } catch (error: ParseError) {
+            return null
+        }
+    }
 
     private fun expression(): Expr {
         return equality()
@@ -80,11 +92,18 @@ class Parser(val tokens: MutableList<Token>) {
             return Expr.Grouping(expr)
         }
 
-        throw Exception("Expected Expression")
+        throw error(peek(), "Expect expression.")
     }
 
-    private fun consume(rightParen: TokenType, s: String) {
+    private fun consume(type: TokenType, message: String): Token {
+        if (checkType(type)) return advance()
 
+        throw error(peek(), message)
+    }
+
+    private fun error(token: Token, message: String): ParseError {
+        Klox.error(token, message)
+        return ParseError()
     }
 
     private fun match(vararg types: TokenType): Boolean {
@@ -96,6 +115,27 @@ class Parser(val tokens: MutableList<Token>) {
         }
 
         return false
+    }
+
+    private fun synchronize() {
+        advance()
+
+        while (!isAtEnd()) {
+            if (previous().type == TokenType.SEMICOLON) return
+
+            when (peek().type) {
+                TokenType.CLASS -> return
+                TokenType.FUN -> return
+                TokenType.VAR -> return
+                TokenType.FOR -> return
+                TokenType.IF -> return
+                TokenType.WHILE -> return
+                TokenType.PRINT -> return
+                TokenType.RETURN -> return
+            }
+
+            advance()
+        }
     }
 
     private fun checkType(type: TokenType): Boolean {

@@ -3,6 +3,7 @@ package klox
 import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Paths
+import kotlin.math.exp
 import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
@@ -40,9 +41,12 @@ class Klox {
         val scanner = Scanner(source)
         val tokens = scanner.scanTokens()
 
-        for (token in tokens) {
-            println(token)
-        }
+        val parser = Parser(tokens as MutableList<Token>)
+        val expression = parser.parse()
+
+        if (hadError) return
+
+        println(AstPrinter().print(expression!!))
     }
 
     companion object {
@@ -50,6 +54,14 @@ class Klox {
 
         fun error(line: Int, message: String) {
             report(line, "", message)
+        }
+
+        fun error(token: Token, message: String) {
+            if (token.type == TokenType.EOF) {
+                report(token.line, " at end", message)
+            } else {
+                report(token.line, " at '${token.lexeme}'", message)
+            }
         }
 
         private fun report(line: Int, where: String, message: String) {
