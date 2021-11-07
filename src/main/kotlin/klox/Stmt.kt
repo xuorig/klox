@@ -34,4 +34,10 @@ sealed class Stmt {
             visitor.visitIfStmt(this)
         }
     }
+
+    class While(val condition: Expr, val body: Stmt) : Stmt() {
+        override fun accept(visitor: StmtVisitor) {
+            visitor.visitWhileStmt(this)
+        }
+    }
 }

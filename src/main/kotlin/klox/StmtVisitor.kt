@@ -6,4 +6,5 @@ interface StmtVisitor {
     fun visitVarStmt(arg: Stmt.Var)
     fun visitBlockStmt(block: Stmt.Block)
     fun visitIfStmt(arg: Stmt.If)
+    fun visitWhileStmt(arg: Stmt.While)
 }

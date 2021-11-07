@@ -158,6 +158,12 @@ class Interpreter : Visitor<Any?>, StmtVisitor {
         }
     }
 
+    override fun visitWhileStmt(stmt: Stmt.While) {
+        while (isTruthy(evaluate(stmt.condition))) {
+            stmt.body.accept(this)
+        }
+    }
+
     private fun executeBlock(statements: List<Stmt>, environment: Environment) {
         val previous = this.environment
 
