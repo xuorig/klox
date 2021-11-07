@@ -26,4 +26,22 @@ sealed class Expr {
             return visitor.visitUnaryExpr(this)
         }
     }
+
+    class Variable(val name: Token) : Expr() {
+        override fun <R> accept(visitor: Visitor<R>): R {
+            return visitor.visitVariableExpr(this)
+        }
+    }
+
+    class Assign(val name: Token, val value: Expr) : Expr() {
+        override fun <R> accept(visitor: Visitor<R>): R {
+            return visitor.visitAssignExpr(this)
+        }
+    }
+
+    class Logical(val left: Expr, val operator: Token, val right: Expr) : Expr() {
+        override fun <R> accept(visitor: Visitor<R>): R {
+            return visitor.visitLogicalExpr(this)
+        }
+    }
 }

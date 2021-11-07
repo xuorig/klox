@@ -49,4 +49,16 @@ class AstPrinter : Visitor<String> {
 
         return builder.toString()
     }
+
+    override fun visitVariableExpr(variable: Expr.Variable): String {
+        TODO("Not yet implemented")
+    }
+
+    override fun visitAssignExpr(assign: Expr.Assign): String {
+        TODO("Not yet implemented")
+    }
+
+    override fun visitLogicalExpr(logical: Expr.Logical): String {
+        TODO("Not yet implemented")
+    }
 }

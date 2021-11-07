@@ -1,8 +1,8 @@
 package klox
 
-import java.lang.RuntimeException
-
 class Interpreter : Visitor<Any?>, StmtVisitor {
+    var environment: Environment = Environment()
+
     fun interpret(statements: List<Stmt>) {
        try {
            for (statement in statements) {
@@ -135,5 +135,63 @@ class Interpreter : Visitor<Any?>, StmtVisitor {
     override fun visitPrintStmt(stmt: Stmt.Print) {
         val value = evaluate(stmt.expression)
         println(stringify(value))
+    }
+
+    override fun visitVarStmt(arg: Stmt.Var) {
+        if (arg.initializer != null) {
+           val value = evaluate(arg.initializer)
+            environment.define(arg.name.lexeme, value)
+        } else {
+            environment.define(arg.name.lexeme, null)
+        }
+    }
+
+    override fun visitBlockStmt(block: Stmt.Block) {
+        executeBlock(block.statements, Environment(environment))
+    }
+
+    override fun visitIfStmt(stmt: Stmt.If) {
+        if (isTruthy(evaluate(stmt.condition))) {
+            stmt.thenBranch.accept(this)
+        } else if (stmt.elseBranch != null) {
+            stmt.elseBranch.accept(this)
+        }
+    }
+
+    private fun executeBlock(statements: List<Stmt>, environment: Environment) {
+        val previous = this.environment
+
+        try {
+            this.environment = environment
+
+            for (statement in statements) {
+                statement.accept(this)
+            }
+        } finally {
+            this.environment = previous
+        }
+
+    }
+
+    override fun visitVariableExpr(variable: Expr.Variable): Any? {
+        return environment.get(variable.name)
+    }
+
+    override fun visitAssignExpr(assign: Expr.Assign): Any? {
+        val value = evaluate(assign.value)
+        environment.assign(assign.name, value)
+        return value
+    }
+
+    override fun visitLogicalExpr(logical: Expr.Logical): Any? {
+        val left = evaluate(logical.left)
+
+        if (logical.operator.type == TokenType.OR) {
+            if (isTruthy(left)) return left
+        } else {
+            if (!isTruthy(left)) return left
+        }
+
+        return evaluate(logical.right)
     }
 }

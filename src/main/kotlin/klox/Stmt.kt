@@ -16,4 +16,22 @@ sealed class Stmt {
             visitor.visitPrintStmt(this)
         }
     }
+
+    class Var(val name: Token, val initializer: Expr?) : Stmt() {
+        override fun accept(visitor: StmtVisitor) {
+            visitor.visitVarStmt(this)
+        }
+    }
+
+    class Block(val statements: List<Stmt>) : Stmt() {
+        override fun accept(visitor: StmtVisitor) {
+            visitor.visitBlockStmt(this)
+        }
+    }
+
+    class If(val condition: Expr, val thenBranch: Stmt, val elseBranch: Stmt?) : Stmt() {
+        override fun accept(visitor: StmtVisitor) {
+            visitor.visitIfStmt(this)
+        }
+    }
 }
